@@ -1,0 +1,8 @@
+pyyaml
+opencv-contrib-python
+matplotlib
+numpy
+tqdm
+tensorboard
+torchmetrics
+segmentation-models-pytorch

@@ -1,0 +1,54 @@
+TRAIN_FILTER:
+  - data/train_fold_1/*/*
+  - data/train_fold_2/*/*
+  - data/train_fold_3/*/*
+  - data/train_fold_4/*/*
+
+VAL_FILTER:
+  - data/val_fold_5/*/*
+
+
+NETWORK_TYPE: smp
+NETWORK_IMAGE_SIZE_X: 480
+NETWORK_IMAGE_SIZE_Y:  384
+
+MAX_EPOCHS: 60
+
+LEARNING_RATE_INITIAL: 0.001
+LEARNING_RATE_SCHEDULER_STEP:
+  - 10
+LEARNING_RATE_SCHEDULER_GAMMA: 0.1
+BATCH_SIZE: 8
+
+FORCE_CLASSIFICATION: True
+DATALOADER_FORCE_METHOD: 2
+NUM_FORCE_CLASSES: 9
+FORCE_THRESHOLDS:
+  - 0.0
+  - 0.5
+  - 1.0
+  - 2.0
+  - 4.0
+  - 8.0
+  - 16.0
+  - 32.0
+  - 64.0
+
+CONTACT_THRESH: 1.0
+
+DATALOADER_IMAGE_METHOD: 0   # How the input image will be represented
+NETWORK_INPUT_CHANNELS: 3
+
+DATALOADER_TEST_SKIP_FRAMES: 200  # When training, the validation epoch can take a long time. We subsample the test set 1/n times to make this faster. 1 means no subsampling
+
+NUM_WORKERS: 12
+
+CROP_IMAGES: True
+CROP_MARGIN: 50
+
+TRAIN_ITERS_PER_EPOCH: 10000
+
+EXCLUDE_ACTIONS:
+  - type_sentence
+  - calibration
+  - type_ipad
