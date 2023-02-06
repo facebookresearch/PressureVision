@@ -7,6 +7,8 @@ import torch
 import segmentation_models_pytorch as smp
 from recording.util import resnet_preprocessor
 
+import ssl  # Hack to get around SSL certificate of the segmentation_models_pytorch being out of date
+ssl._create_default_https_context = ssl._create_unverified_context
 
 def build_model(config, device, phases):
     from prediction.loader import ForceDataset  # hacky shit

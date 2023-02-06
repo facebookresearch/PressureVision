@@ -92,7 +92,6 @@ def run_metrics(all_metrics, pressure_gt, pressure_est, config):
     contact_gt = (pressure_gt > config.CONTACT_THRESH).long()
 
     all_metrics['contact_iou'](contact_pred, contact_gt)
-    all_metrics['contact_f1'](contact_pred, contact_gt)
 
     all_metrics['mse'](pressure_est, pressure_gt)
     all_metrics['mae'](pressure_est, pressure_gt)
@@ -108,28 +107,29 @@ def setup_metrics(device):
     all_metrics = dict()
 
     all_metrics['contact_iou'] = ContactIOU().to(device)
-    all_metrics['contact_f1'] = torchmetrics.F1Score(num_classes=2, average='macro', mdmc_average='samplewise').to(device)
     all_metrics['mse'] = torchmetrics.MeanSquaredError().to(device)
     all_metrics['mae'] = torchmetrics.MeanAbsoluteError().to(device)
     all_metrics['vol_iou'] = VolumetricIOU().to(device)
-    all_metrics['temporal_accuracy'] = torchmetrics.Accuracy().to(device)
+    all_metrics['temporal_accuracy'] = torchmetrics.Accuracy(task='binary').to(device)
     return all_metrics
 
 
 def evaluate(config, device, force_eval_on_test_set=False):
-    config.DATALOADER_TEST_SKIP_FRAMES = 4
 
     if force_eval_on_test_set:
         print('Testing on test set!')
         config.VAL_FILTER = ['data/test/*/*']
         config.DATALOADER_TEST_SKIP_FRAMES = 1
+    else:
+        config.DATALOADER_TEST_SKIP_FRAMES = 4  # Test on 1/4 of frames to speed up testing
+        print('Testing on validation set!')
 
-    print('RUNNING EVAL, SKIPPING', config.DATALOADER_TEST_SKIP_FRAMES)
     random.seed(5)  # Set the seed so the sequences will be randomized the same
     model_dict = build_model(config, device, ['val'])
 
     checkpoint_path = util.find_latest_checkpoint(config)
-    best_model = torch.load(checkpoint_path)
+    best_model = model_dict['model']
+    best_model.load_state_dict(torch.load(checkpoint_path))
     best_model.eval()
 
     val_loader = DataLoader(model_dict['val_dataset'], batch_size=config.BATCH_SIZE, shuffle=True, num_workers=config.NUM_WORKERS)

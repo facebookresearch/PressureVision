@@ -94,7 +94,7 @@ def find_latest_checkpoint(config):
     """
     Finds the newest model checkpoint file, sorted by the date of the file
     """
-    all_checkpoints = glob.glob('data/model/*.pth')
+    all_checkpoints = glob.glob('data/model/*.pt')
     possible_matches = []
     for p in all_checkpoints:
         f = os.path.basename(p)
@@ -135,8 +135,8 @@ def set_subframe(subframe_id, subframe, disp_frame, steps_x=2, steps_y=2, title=
         cv2.putText(subframe, str(title), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
         cv2.putText(subframe, str(title), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
-    start_x = (subframe_id % steps_x) * inc_x
-    start_y = (subframe_id // steps_x) * inc_y
+    start_x = int((subframe_id % steps_x) * inc_x)
+    start_y = int(subframe_id // steps_x) * inc_y
     disp_frame[start_y:start_y + inc_y, start_x:start_x + inc_x] = subframe
 
 

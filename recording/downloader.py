@@ -10,7 +10,7 @@ import zipfile
 from tqdm import tqdm
 from recording.util import mkdir
 
-download_zips = {
+download_full_zips = {
     'test/9010_cray_crane.zip':                 'https://www.dropbox.com/s/mqmlypbhh17cxmv/9010_cray_crane.zip?dl=1',
     'test/9011_pug_rahl.zip':                   'https://www.dropbox.com/s/zkki9adz4xj06nh/9011_pug_rahl.zip?dl=1',
     'test/9014_jean_anthony.zip':               'https://www.dropbox.com/s/r5ypnry8jwzrqiu/9014_jean_anthony.zip?dl=1',
@@ -49,15 +49,30 @@ download_zips = {
     'val_fold_5/9039_tiana_gordon.zip':         'https://www.dropbox.com/s/nm52v65xccd8e31/9039_tiana_gordon.zip?dl=1',
 }
 
+download_small_zips = {
+    'test.zip':         'https://www.dropbox.com/s/iofj8jonnvl1e7n/test.zip?dl=1',
+    'train_fold_1.zip': 'https://www.dropbox.com/s/5zkrk1kba3bumjm/train_fold_1.zip?dl=1',
+    'train_fold_2.zip': 'https://www.dropbox.com/s/gr0gxiwhqo694oa/train_fold_2.zip?dl=1',
+    'train_fold_3.zip': 'https://www.dropbox.com/s/22try8qk8zqfw4m/train_fold_3.zip?dl=1',
+    'train_fold_4.zip': 'https://www.dropbox.com/s/y8b0gkf5incuk22/train_fold_4.zip?dl=1',
+    'val_fold_5.zip':   'https://www.dropbox.com/s/pl8iw4svzgnxi7r/val_fold_5.zip?dl=1',
+
+}
+
 SAVE_ROOT_DIR = 'data'
 
 
 def download_model_checkpoint():
-    save_path = os.path.join(SAVE_ROOT_DIR, 'model/paper_59.pth')
-    download_file_from_url('https://www.dropbox.com/s/abyhtojj972rzh8/paper_59.pth?dl=1', save_path)
+    save_path = os.path.join(SAVE_ROOT_DIR, 'model/paper_59.pt')
+    download_file_from_url('https://www.dropbox.com/s/pqoj0578fn550e0/paper_59.pt?dl=1', save_path)
 
 
-def download_all_zips():
+def download_all_zips(full=False):
+    if not full:
+        download_zips = download_small_zips
+    else:
+        download_zips = download_full_zips
+
     for file_path in download_zips:
         save_zip_path = os.path.join(SAVE_ROOT_DIR, file_path)
         final_dir_path = os.path.splitext(save_zip_path)[0]     # Strip the extension
@@ -128,6 +143,10 @@ def download_file_from_url(url, filename):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Download dataset and model files')
+    parser.add_argument('--full', action='store_true')  # Download the full (960GB) dataset instead of the small (140GB) dataset
+    args = parser.parse_args()
+
     download_model_checkpoint()
-    download_all_zips()
+    download_all_zips(full=args.full)
 

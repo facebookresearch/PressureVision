@@ -22,7 +22,8 @@ def generate_movie(num_frames, overlay=False):
     random.seed(5)  # Set the seed so the sequences will be randomized the same
     model_dict = build_model(config, device, ['val'])
 
-    best_model = torch.load(util.find_latest_checkpoint(config))
+    best_model = model_dict['model']
+    best_model.load_state_dict(torch.load(util.find_latest_checkpoint(config)))
     best_model.eval()
 
     val_dataloader = DataLoader(model_dict['val_dataset'], batch_size=1, shuffle=False, num_workers=config.NUM_WORKERS)
@@ -30,7 +31,7 @@ def generate_movie(num_frames, overlay=False):
     out_path = os.path.join('data', 'movies', config.CONFIG_NAME + '_movie.avi')
     print('Saving output video to:', out_path)
     util.mkdir(out_path, cut_filename=True)
-    mw = util.MovieWriter(out_path)
+    mw = util.MovieWriter(out_path, fps=15)
 
     for idx, batch in enumerate(tqdm(val_dataloader, total=num_frames)):
         image_model = batch['img']
@@ -60,13 +61,13 @@ def generate_movie(num_frames, overlay=False):
                 force_color_pred = cv2.addWeighted(force_color_pred, 1.0, image_save, val_img, 0)
 
             disp_frame = np.zeros((384 * 2, 480 * 2, 3), np.uint8)
-            util.set_subframe(0, image_save, disp_frame, title='RGB')
-            util.set_subframe(1, force_color_gt, disp_frame, title='GT Pressure')
-            util.set_subframe(2, image_save, disp_frame, title='RGB')
+            util.set_subframe(0.5, image_save, disp_frame, title='Input RGB Frame')
+            util.set_subframe(2, force_color_gt, disp_frame, title='Ground Truth Pressure')
             util.set_subframe(3, force_color_pred, disp_frame, title='Estimated Pressure')
 
-            cv2.putText(disp_frame, '{} {}'.format(participant, batch['timestep'][0].item()), (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
-            cv2.putText(disp_frame, '{}'.format(action), (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
+            # Display participant, action, frame #, etc
+            # cv2.putText(disp_frame, '{} {}'.format(participant, batch['timestep'][0].item()), (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
+            # cv2.putText(disp_frame, '{}'.format(action), (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
 
             mw.write_frame(disp_frame)
 

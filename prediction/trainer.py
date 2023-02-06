@@ -109,7 +109,7 @@ if __name__ == "__main__":
     for epoch in range(config.MAX_EPOCHS):
         train_epoch(config)
         val_epoch(config, val_metrics)
-        torch.save(model, 'data/model/{}_{}.pth'.format(config.CONFIG_NAME, epoch))
+        torch.save(model.state_dict(), 'data/model/{}_{}.pt'.format(config.CONFIG_NAME, epoch))
         scheduler.step()
         print('\n')
 

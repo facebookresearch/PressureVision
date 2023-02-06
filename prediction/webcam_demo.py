@@ -8,6 +8,7 @@ import torch
 import numpy as np
 import torch.multiprocessing
 import recording.util as util
+from prediction.model_builder import build_model
 
 disp_x = 480 * 2
 disp_y = 384 * 2
@@ -57,7 +58,9 @@ def run_demo():
 
     scale = 355
 
-    best_model = torch.load(util.find_latest_checkpoint(config))
+    model_dict = build_model(config, device, ['val'])
+    best_model = model_dict['model']
+    best_model.load_state_dict(torch.load(util.find_latest_checkpoint(config)))
     best_model.eval()
 
     def change_scale(value):
