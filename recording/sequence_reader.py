@@ -215,9 +215,9 @@ class SequenceReader:
         force = self.get_pressure_kPa(frame_idx)
         util.set_subframe(0, util.pressure_to_colormap(force), disp_frame, subframes_x, subframes_y, title='Pressure')
 
-        depth = np.clip(self.get_depth(frame_idx) / 1500, 0, 1) * 255
-        depth_color = cv2.applyColorMap(depth.astype(np.uint8), cv2.COLORMAP_HOT)
-        util.set_subframe(1, depth_color, disp_frame, subframes_x, subframes_y, title='Depth')
+        # depth = np.clip(self.get_depth(frame_idx) / 1500, 0, 1) * 255
+        # depth_color = cv2.applyColorMap(depth.astype(np.uint8), cv2.COLORMAP_HOT)
+        # util.set_subframe(1, depth_color, disp_frame, subframes_x, subframes_y, title='Depth')
 
         for c in range(self.num_cameras):
             if overlay_force:
